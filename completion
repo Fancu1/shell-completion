@@ -1,0 +1,37 @@
+_xt_cli_completions()
+{
+	local cur prev opts commands
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+	# TODO: Allow custom commands
+	opts="--variables --help"
+	commands="cluster db gen oncer sess-locker session shell version"
+
+	# If we are at the second word and it does not start with '-', suggest commands
+	if [ $COMP_CWORD -eq 1 ]; then
+		COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
+		return 0
+	fi
+
+	# If we are beyond the second word, or the current word starts with '-', suggest options
+	case "${prev}" in
+		my-cli)
+		COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+		return 0
+		;;
+	*)
+		;;
+	esac
+}
+
+# random command name
+cmd="my-cli"
+
+if type complete &>/dev/null; then
+	# bash
+	complete -F _xt_cli_completions $cmd
+elif type compctl &>/dev/null; then
+	# zsh
+	compctl -K _xt_cli_completions $cmd
+fi
